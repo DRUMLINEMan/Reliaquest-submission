@@ -10,6 +10,7 @@ import org.mockito.Mock;
 import org.mockito.junit.jupiter.MockitoExtension;
 import org.springframework.http.ResponseEntity;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static org.junit.jupiter.api.Assertions.*;
@@ -49,10 +50,18 @@ class EmployeeControllerImplTest {
     @Test
     void getEmployeesByNameSearch_validInput_returnsOk() {
         List<Employee> employees = List.of(mock(Employee.class));
-        when(employeeService.getEmployeesByNameSearch("john")).thenReturn(employees);
+        doReturn(employees).when(employeeService).getEmployeesByNameSearch("john");
         ResponseEntity<List<Employee>> response = controller.getEmployeesByNameSearch("john");
         assertTrue(response.getStatusCode().is2xxSuccessful());
         assertEquals(employees, response.getBody());
+        verify(employeeService).getEmployeesByNameSearch("john");
+    }
+
+    @Test
+    void getEmployeesByNameSearch_validInput_returnsNotFound() {
+        when(employeeService.getEmployeesByNameSearch("john")).thenReturn(new ArrayList<>());
+        ResponseEntity<List<Employee>> response = controller.getEmployeesByNameSearch("john");
+        assertEquals(404, response.getStatusCode().value());
         verify(employeeService).getEmployeesByNameSearch("john");
     }
 
@@ -83,6 +92,14 @@ class EmployeeControllerImplTest {
     }
 
     @Test
+    void getEmployeeById_validId_returnsNotFound() {
+        when(employeeService.getEmployeeById("123")).thenReturn(null);
+        ResponseEntity<Employee> response = controller.getEmployeeById("123");
+        assertEquals(404, response.getStatusCode().value());
+        verify(employeeService).getEmployeeById("123");
+    }
+
+    @Test
     void getEmployeeById_blankId_returnsBadRequest() {
         ResponseEntity<Employee> response = controller.getEmployeeById("");
         assertTrue(response.getStatusCode().is4xxClientError());
@@ -104,6 +121,13 @@ class EmployeeControllerImplTest {
         ResponseEntity<Integer> response = controller.getHighestSalaryOfEmployees();
         assertTrue(response.getStatusCode().is2xxSuccessful());
         assertEquals(90000, response.getBody());
+    }
+
+    @Test
+    void getHighestSalary_returnsNotFound() {
+        when(employeeService.getHighestSalaryOfEmployees()).thenReturn(null);
+        ResponseEntity<Integer> response = controller.getHighestSalaryOfEmployees();
+        assertEquals(404,response.getStatusCode().value());
     }
 
     @Test

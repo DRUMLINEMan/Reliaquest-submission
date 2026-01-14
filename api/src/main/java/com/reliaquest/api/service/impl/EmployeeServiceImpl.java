@@ -33,10 +33,12 @@ public class EmployeeServiceImpl implements IEmployeeService {
 
     @Override
     public Integer getHighestSalaryOfEmployees() {
-        return mockEmployeeTable.values().stream()
+        Integer salary =  mockEmployeeTable.values().stream()
                 .map(Employee::employee_salary)
                 .max(Integer::compareTo)
                 .orElse(null);
+        if (salary == null) log.warn("No salaries found.");
+        return salary;
     }
 
     @Override

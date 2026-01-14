@@ -53,7 +53,9 @@ public class EmployeeControllerImpl implements IEmployeeController<Employee, Emp
         }
 
         try {
-            return ResponseEntity.ok(employeeService.getEmployeesByNameSearch(searchString));
+            List<Employee> employees = employeeService.getEmployeesByNameSearch(searchString);
+            if (employees.isEmpty()) return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(employees);
         } catch (Exception e) {
             log.error("Failed to get employees by name", e);
             return ResponseEntity.internalServerError().build();
@@ -76,7 +78,9 @@ public class EmployeeControllerImpl implements IEmployeeController<Employee, Emp
         }
 
         try {
-            return ResponseEntity.ok(employeeService.getEmployeeById(id));
+            Employee employee = employeeService.getEmployeeById(id);
+            if (employee == null) return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(employee);
         } catch (Exception e) {
             log.error("Failed to get employee by id", e);
             return ResponseEntity.internalServerError().build();
@@ -92,7 +96,9 @@ public class EmployeeControllerImpl implements IEmployeeController<Employee, Emp
     @Override
     public ResponseEntity<Integer> getHighestSalaryOfEmployees() {
         try {
-            return ResponseEntity.ok(employeeService.getHighestSalaryOfEmployees());
+            Integer salary = employeeService.getHighestSalaryOfEmployees();
+            if (salary == null) return ResponseEntity.notFound().build();
+            return ResponseEntity.ok(salary);
         } catch (Exception e) {
             log.error("Failed to get highest employee salary", e);
             return ResponseEntity.internalServerError().build();
